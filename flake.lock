@@ -1,38 +1,41 @@
 {
   "nodes": {
-    "gnulib-src": {
-      "flake": false,
+    "mvn2nix": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "utils": "utils"
+      },
       "locked": {
-        "lastModified": 1588070119,
-        "narHash": "sha256-gMIWbMSKisS5w6QxKFfN1IJHPHxZw9h5upzxpada+1c=",
-        "ref": "master",
-        "rev": "5ec4d920e4acb45225320c3df9ae32fdff928413",
-        "revCount": 20684,
-        "type": "git",
-        "url": "https://git.savannah.gnu.org/git/gnulib.git"
+        "lastModified": 1629170129,
+        "narHash": "sha256-v/HvYqzkPaGin1ujo+Fi59wXC9vWxW3lYVSwElORRi8=",
+        "owner": "fzakaria",
+        "repo": "mvn2nix",
+        "rev": "ea21cfe97069feee55fa307ca9b125616c1fa84f",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "https://git.savannah.gnu.org/git/gnulib.git"
-      }
-    },
-    "hello-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1549746003,
-        "narHash": "sha256-7losVbaLgy9pjL6GoOrZAK6O6nCXm3pddo03UZDjxUc=",
-        "ref": "master",
-        "rev": "0cce403f478bd0a4a60d0b8566c67d3a72498008",
-        "revCount": 454,
-        "type": "git",
-        "url": "https://git.savannah.gnu.org/git/hello.git"
-      },
-      "original": {
-        "type": "git",
-        "url": "https://git.savannah.gnu.org/git/hello.git"
+        "owner": "fzakaria",
+        "repo": "mvn2nix",
+        "type": "github"
       }
     },
     "nixpkgs": {
+      "locked": {
+        "lastModified": 1625176478,
+        "narHash": "sha256-s1RTYNKw7ySyqrZjns9Cq+Nnjpp75ePgL06pgcbIpoA=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "21b696caf392ad6fa513caf3327d0aa0430ffb72",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-21.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
       "locked": {
         "lastModified": 1603528673,
         "narHash": "sha256-iFrxF9GMes1jH7v8qjep1BsQYEq/admkEv/gJoqQsHo=",
@@ -49,9 +52,23 @@
     },
     "root": {
       "inputs": {
-        "gnulib-src": "gnulib-src",
-        "hello-src": "hello-src",
-        "nixpkgs": "nixpkgs"
+        "mvn2nix": "mvn2nix",
+        "nixpkgs": "nixpkgs_2"
+      }
+    },
+    "utils": {
+      "locked": {
+        "lastModified": 1623875721,
+        "narHash": "sha256-A8BU7bjS5GirpAUv4QA+QnJ4CceLHkcXdRp4xITDB0s=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "f7e004a55b120c02ecb6219596820fcd32ca8772",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
       }
     }
   },

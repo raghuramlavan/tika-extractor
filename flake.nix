@@ -1,18 +1,11 @@
 {
   description = "(insert short project description here)";
 
-  # Nixpkgs / NixOS version to use.
   inputs.nixpkgs.url = "nixpkgs/nixos-20.09";
+  inputs.mvn2nix.url = "github:fzakaria/mvn2nix";
 
-  # Upstream source tree(s).
-  inputs.hello-src = { url = git+https://git.savannah.gnu.org/git/hello.git; flake = false; };
-  inputs.gnulib-src = { url = git+https://git.savannah.gnu.org/git/gnulib.git; flake = false; };
-
-  outputs = { self, nixpkgs, hello-src, gnulib-src }:
+  outputs = { self, nixpkgs, mvn2nix }:
     let
-
-      # Generate a user-friendly version numer.
-      version = builtins.substring 0 8 hello-src.lastModifiedDate;
 
       # System types to support.
       supportedSystems = [ "x86_64-linux" ];
@@ -23,98 +16,58 @@
       # Nixpkgs instantiated for supported system types.
       nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; overlays = [ self.overlay ]; });
 
+      pkgsForSystem = forAllSystems( system: import nixpkgs {
+        # ./overlay.nix contains the logic to package local repository
+        overlays = [ mvn2nix.overlay (
+            final: prev: {
+            tikaExtractor = final.callPackage ./tikaExtractor.nix { };
+            }
+        ) ];
+        inherit system;
+      });
+ 
     in
 
     {
 
-      # A Nixpkgs overlay.
-      overlay = final: prev: {
 
-        hello = with final; stdenv.mkDerivation rec {
-          name = "hello-${version}";
-
-          src = hello-src;
-
-          buildInputs = [ autoconf automake gettext gnulib perl gperf texinfo help2man ];
-
-          preConfigure = ''
-            mkdir -p .git # force BUILD_FROM_GIT
-            ./bootstrap --gnulib-srcdir=${gnulib-src} --no-git --skip-po
-          '';
-
-          meta = {
-            homepage = "https://www.gnu.org/software/hello/";
-            description = "A program to show a familiar, friendly greeting";
-          };
-        };
-
-      };
-
-      # Provide some binary packages for selected system types.
       packages = forAllSystems (system:
         {
-          inherit (nixpkgsFor.${system}) hello;
+          inherit (pkgsForSystem.${system}) tikaExtractor;
         });
 
-      # The default package for 'nix build'. This makes sense if the
-      # flake provides only one package or there is a clear "main"
-      # package.
-      defaultPackage = forAllSystems (system: self.packages.${system}.hello);
+      defaultPackage = forAllSystems (system: self.packages.${system}.tikaExtractor);
 
-      # A NixOS module, if applicable (e.g. if the package provides a system service).
-      nixosModules.hello =
-        { pkgs, ... }:
-        {
-          nixpkgs.overlays = [ self.overlay ];
+      nixosModules.tika-extractor={config, nixpkgs, lib,...}:with lib; {
 
-          environment.systemPackages = [ pkgs.hello ];
+                options = {
 
-          #systemd.services = { ... };
-        };
+                  services.tika-extractor = {
+                    enable = mkOption {
+                      type = types.bool;
+                      default = false;
+                      description = ''
+                      tika server
+                      '';
+                    };
+                  };
 
-      # Tests run by 'nix flake check' and by Hydra.
-      checks = forAllSystems (system: {
-        inherit (self.packages.${system}) hello;
+                };
 
-        # Additional tests, if applicable.
-        test =
-          with nixpkgsFor.${system};
-          stdenv.mkDerivation {
-            name = "hello-test-${version}";
 
-            buildInputs = [ hello ];
+                ###### implementation
 
-            unpackPhase = "true";
-
-            buildPhase = ''
-              echo 'running some integration tests'
-              [[ $(hello) = 'Hello, world!' ]]
-            '';
-
-            installPhase = "mkdir -p $out";
-          };
-
-        # A VM test of the NixOS module.
-        vmTest =
-          with import (nixpkgs + "/nixos/lib/testing-python.nix") {
-            inherit system;
-          };
-
-          makeTest {
-            nodes = {
-              client = { ... }: {
-                imports = [ self.nixosModules.hello ];
-              };
-            };
-
-            testScript =
-              ''
-                start_all()
-                client.wait_for_unit("multi-user.target")
-                client.succeed("hello")
-              '';
-          };
-      });
+                config = mkIf config.services.tika-server.enable {
+                  systemd.services.tika-extractor = {
+                    description = "Tika extractor";
+                    serviceConfig = {
+                      ExecStart =  "${self.packages.x86_64-linux.tika-extractor-1.1}/bin/tika-extractor";
+                      
+                    };
+                  };
+                };
+         
+         };
 
     };
 }
