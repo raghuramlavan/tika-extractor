@@ -61,7 +61,7 @@
                   systemd.services.tika-extractor = {
                     description = "Tika extractor";
                     serviceConfig = {
-                      ExecStart =  "${self.packages.x86_64-linux.tika-extractor-1.1}/bin/tika-extractor";
+                      ExecStart =  "${self.packages.x86_64-linux.tikaExtractor}/bin/tika-extractor";
                       
                     };
                   };
