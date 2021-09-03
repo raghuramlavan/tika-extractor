@@ -47,7 +47,7 @@
                       type = types.bool;
                       default = false;
                       description = ''
-                      tika server
+                      tika extractor
                       '';
                     };
                   };
@@ -57,7 +57,7 @@
 
                 ###### implementation
 
-                config = mkIf config.services.tika-server.enable {
+                config = mkIf config.services.tika-extractor.enable {
                   systemd.services.tika-extractor = {
                     description = "Tika extractor";
                     serviceConfig = {
