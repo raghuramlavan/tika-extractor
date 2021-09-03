@@ -12,6 +12,7 @@ in stdenv.mkDerivation rec {
   name = "${pname}-${version}";
   src = fetchGit{
     url =https://github.com/ipfs-search/tika-extractor;
+    ref ="main";
     rev= "e629c4a6362916001deb430584ddc3fdc8a4bf6a";
       };
 
